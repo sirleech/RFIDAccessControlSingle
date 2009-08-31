@@ -3,12 +3,12 @@
  *
  * This project implements a single stand-alone RFID access control
  * system that can operate independently of a host computer or any
- * other device. It uses an ID-12 RFID reader module from ID
- * Innovations to scan for 125KHz "Unique" RFID tags, and when a
- * recognised tag is identified it toggles an output for a configurable
- * duration, typically 2 seconds. The output can then be used to
- * control a relay to trip an electric striker plate to release a door
- * lock.
+ * other device. It uses either an ID-12 RFID reader module from ID
+ * Innovations or an RDM630 RFID reader module from Seeed Studio to
+ * scan for 125KHz RFID tags, and when a recognised tag is identified
+ * it toggles an output for a configurable duration, typically 2
+ * seconds. The output can then be used to control a relay to trip an
+ * electric striker plate to release a door lock.
  *
  * Because this project is intended to provide a minimal working system
  * it does not have any provision for database updates to be managed
@@ -29,42 +29,37 @@
  */
 
 // Set up the serial connection to the RFID reader module. The module's
-// TX pin needs to be connected to RX (pin 2) on the Arduino. Module
+// TX pin needs to be connected to RX (pin 4) on the Arduino. Module
 // RX doesn't need to be connected to anything since we won't send
 // commands to it, but SoftwareSerial requires us to define a pin for
 // TX anyway so you can either connect module RX to Arduino TX or just
 // leave them disconnected.
 #include <SoftwareSerial.h>
-#define rxPin 2
-#define txPin 3
+#define rxPin 4
+#define txPin 5
 
 // Create a software serial object for the connection to the RFID module
 SoftwareSerial rfid = SoftwareSerial( rxPin, txPin );
 
 // Set up outputs
-#define strikerPlate 12  // Output pin connected to door lock
+#define strikePlate 12  // Output pin connected to door lock
 #define ledPin 13        // LED status output
 #define unlockSeconds 2  // Seconds to hold door lock open
 
 // The tag database consists of two parts. The first part is an array of
 // tag values with each tag taking up 5 bytes. The second is a list of
 // names with one name for each tag (ie: group of 5 bytes).
-/*byte allowedTag[10] = {
-  0x01, 0x04, 0xF5, 0xB5, 0x22,   // Tag 1
-  0x04, 0x14, 0x6E, 0x8B, 0xDD,   // Tag 2
-};*/
-
 char* allowedTags[] = {
-  "0104F5B522",         // Tag 1
-  "04146E8BDE",         // Tag 2
-  "0413BBBF22",         // Tag 3
+  "0104F5B523",         // Tag 1
+  "04146E8BDD",         // Tag 2
+  "0413BBBF23",         // Tag 3
 };
 
 // List of names to associate with the matching tag IDs
 char* tagName[] = {
   "Jonathan Oxer",      // Tag 1
-  "Michael Oxer",       // Tag 2
-  "Dog Implant",        // Tag 3
+  "Hugh Blemings",      // Tag 2
+  "Dexter D Dog",       // Tag 3
 };
 
 // Check the number of tags defined
@@ -77,6 +72,10 @@ int incomingByte = 0;    // To store incoming serial data
  */
 void setup() {
   pinMode(ledPin, OUTPUT);
+  digitalWrite(ledPin, LOW);
+  pinMode(strikePlate, OUTPUT);
+  digitalWrite(strikePlate, LOW);
+
   Serial.begin(38400);   // Serial port for connection to host
   rfid.begin(9600);      // Serial port for connection to RFID module
 
@@ -162,14 +161,14 @@ void loop() {
       // Search the tag database for this particular tag
       int tagId = findTag( tagValue );
 
-      // Only fire the striker plate if this tag was found in the database
+      // Only fire the strike plate if this tag was found in the database
       if( tagId > 0 )
       {
         Serial.print("Authorized tag ID ");
         Serial.print(tagId);
         Serial.print(": unlocking for ");
         Serial.println(tagName[tagId - 1]);   // Get the name for this tag from the database
-        unlock();                             // Fire the striker plate to open the lock
+        unlock();                             // Fire the strike plate to open the lock
       } else {
         Serial.println("Tag not authorized");
       }
@@ -181,14 +180,14 @@ void loop() {
 }
 
 /**
- * Fire the relay to activate the striker plate for the configured
+ * Fire the relay to activate the strike plate for the configured
  * number of seconds.
  */
 void unlock() {
   digitalWrite(ledPin, HIGH);
-  digitalWrite(strikerPlate, HIGH);
+  digitalWrite(strikePlate, HIGH);
   delay(unlockSeconds * 1000);
-  digitalWrite(strikerPlate, LOW);
+  digitalWrite(strikePlate, LOW);
   digitalWrite(ledPin, LOW);
 }
 
