@@ -28,23 +28,40 @@
  * http://www.practicalarduino.com/projects/medium/rfid-access-control
  */
 
-// Set up the serial connection to the RFID reader module. The module's
-// TX pin needs to be connected to RX (pin 2) on the Arduino. Module
+// Set up the serial connection to the RFID reader module. In order to
+// keep the Arduino TX and RX pins free for communication with a host,
+// the sketch uses the SoftwareSerial library to implement serial
+// communications on other pins.
+#include <SoftwareSerial.h>
+
+// The RFID module's TX pin needs to be connected to the Arduino. Module
 // RX doesn't need to be connected to anything since we won't send
 // commands to it, but SoftwareSerial requires us to define a pin for
 // TX anyway so you can either connect module RX to Arduino TX or just
 // leave them disconnected.
-#include <SoftwareSerial.h>
+
+// If you have built the circuit exactly as described in Practical
+// Arduino, use pins D2 / D3:
 #define rxPin 2
 #define txPin 3
+// If you are using the Freetronics RFID Lock Shield, use pins D4 / D5:
+/* #define rxPin 4 */
+/* #define txPin 5 */
 
 // Create a software serial object for the connection to the RFID module
 SoftwareSerial rfid = SoftwareSerial( rxPin, txPin );
 
-// Set up outputs
-#define strikerPlate 12  // Output pin connected to door lock
-#define ledPin 13        // LED status output
-#define unlockSeconds 2  // Seconds to hold door lock open
+// Set up outputs for the strike plate and status LEDs.
+// If you have built the circuit exactly as described in Practical
+// Arduino, use pins D12 and D13:
+#define strikePlate 12
+#define ledPin 13
+// If you are using the Freetronics RFID Lock Shield, use pins D6 / D7:
+/* #define strikePlate 6 */
+/* #define ledPin 7 */
+
+// Specify how long the strike plate should be held open:
+#define unlockSeconds 2
 
 // The tag database consists of two parts. The first part is an array of
 // tag values with each tag taking up 5 bytes. The second is a list of
@@ -186,9 +203,9 @@ void loop() {
  */
 void unlock() {
   digitalWrite(ledPin, HIGH);
-  digitalWrite(strikerPlate, HIGH);
+  digitalWrite(strikePlate, HIGH);
   delay(unlockSeconds * 1000);
-  digitalWrite(strikerPlate, LOW);
+  digitalWrite(strikePlate, LOW);
   digitalWrite(ledPin, LOW);
 }
 
