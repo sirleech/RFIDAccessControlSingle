@@ -4,7 +4,7 @@
  * This project implements a single stand-alone RFID access control
  * system that can operate independently of a host computer or any
  * other device. It uses either an ID-12 RFID reader module from ID
- * Innovations or an RDM630 RFID reader module from Seeed Studio to
+ * Innovations or an RDM630/RDM880 RFID reader module from Seeed to
  * scan for 125KHz RFID tags, and when a recognised tag is identified
  * it toggles an output for a configurable duration, typically 2
  * seconds. The output can then be used to control a relay to trip an
@@ -42,11 +42,11 @@
 
 // If you have built the circuit exactly as described in Practical
 // Arduino, use pins D2 / D3:
-#define rxPin 2
-#define txPin 3
+//#define rxPin 2
+//#define txPin 3
 // If you are using the Freetronics RFID Lock Shield, use pins D4 / D5:
-/* #define rxPin 4 */
-/* #define txPin 5 */
+#define rxPin 4
+#define txPin 5
 
 // Create a software serial object for the connection to the RFID module
 SoftwareSerial rfid = SoftwareSerial( rxPin, txPin );
@@ -54,11 +54,11 @@ SoftwareSerial rfid = SoftwareSerial( rxPin, txPin );
 // Set up outputs for the strike plate and status LEDs.
 // If you have built the circuit exactly as described in Practical
 // Arduino, use pins D12 and D13:
-#define strikePlate 12
-#define ledPin 13
+//#define strikePlate 12
+//#define ledPin 13
 // If you are using the Freetronics RFID Lock Shield, use pins D6 / D7:
-/* #define strikePlate 6 */
-/* #define ledPin 7 */
+#define strikePlate 6
+#define ledPin 7
 
 // Specify how long the strike plate should be held open.
 #define unlockSeconds 2
