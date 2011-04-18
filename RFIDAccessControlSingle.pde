@@ -4,7 +4,7 @@
  * This project implements a single stand-alone RFID access control
  * system that can operate independently of a host computer or any
  * other device. It uses either an ID-12 RFID reader module from ID
- * Innovations or an RDM630/RDM880 RFID reader module from Seeed to
+ * Innovations or an RDM630 RFID reader module from Seeed to
  * scan for 125KHz RFID tags, and when a recognised tag is identified
  * it toggles an output for a configurable duration, typically 2
  * seconds. The output can then be used to control a relay to trip an
